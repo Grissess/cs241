@@ -1,7 +1,7 @@
 /* 
  *  * CS:APP Data Lab 
  *   * 
- *    * <Please put your name and userid here>
+ *    * Graham Northup <northug>, et. al.
  *     * 
  *      * bits.c - Source file with your solutions to the Lab.
  *       *          This is the file you will hand in to your instructor.
@@ -165,7 +165,13 @@ int isNonZero(int x) {
  *      *   Rating: 2
  *       */
 int copyLSB(int x) {
-  return 2;
+  int a = x & 1;
+  int b = a | (a<<1);
+  int c = b | (b<<2);
+  int d = c | (c<<4);
+  int e = d | (d<<8);
+  int f = e | (e<<16);
+  return f;
 }
 /* 
  *  * rotateRight - Rotate x to the right by n
@@ -178,8 +184,8 @@ int copyLSB(int x) {
 int rotateRight(int x, int n) {
   int temp = ((1 << n) - 1) & x;
   int mask = (1 << (31 - n)) - 1;
-  x = (x >> n) & 
-  return 2;
+  x = (x >> n) & mask | (temp << n)
+  return x;
 }
 /* 
  *  * isNegative - return 1 if x < 0, return 0 otherwise 
@@ -189,7 +195,7 @@ int rotateRight(int x, int n) {
  *      *   Rating: 2
  *       */
 int isNegative(int x) {
-  return 2;
+  return x & (1 << 31);
 }
 /* 
  *  * absVal - absolute value of x
@@ -200,7 +206,7 @@ int isNegative(int x) {
  *       *   Rating: 4
  *        */
 int absVal(int x) {
-  return 2;
+  return x & ~(1 << 31);
 }
 /* 
  *  * negate - return -x 
@@ -210,7 +216,7 @@ int absVal(int x) {
  *      *   Rating: 2
  *       */
 int negate(int x) {
-  return 2;
+  return x ^ (1 << 31);
 }
 /* 
  *  * float_abs - Return bit-level equivalent of absolute value of f for
@@ -224,7 +230,8 @@ int negate(int x) {
  *          *   Rating: 2
  *           */
 unsigned float_abs(unsigned uf) {
-  return 2;
+  if(uf & 0x7F800000 == 0x7F800000 && uf & 0x007FFFFF) return uf;
+  return uf & 0x7FFFFFFF;
 }
 /* 
  *  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -238,7 +245,8 @@ unsigned float_abs(unsigned uf) {
  *          *   Rating: 4
  *           */
 unsigned float_twice(unsigned uf) {
-  return 2;
+  if(uf & 0x7F800000 == 0x7F800000) return uf; /* Also infinity, because infinity can't be doubled */
+  return (uf & 0x107FFFFF) | (((uf & 0x7F800000) >> 23) + 1) << 23;
 }
 /*
  *  * isTmin - returns 1 if x is the minimum, two's complement number,
@@ -248,7 +256,7 @@ unsigned float_twice(unsigned uf) {
  *      *   Rating: 1
  *       */
 int isTmin(int x) {
-  return 2;
+  return !(x ^ (1 << 31));
 }
 /* 
  *  * leastBitPos - return a mask that marks the position of the
