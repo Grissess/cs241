@@ -258,10 +258,10 @@ int isTmin(int x) {
 int leastBitPos(int x) {
   int i;
   for(i = 0; i < 32; i++) {
-		if(x&1) return 1 << i;
-		x <<= 1;
-	}
-	return 0;
+    if(x&1) return 1 << i;
+    x <<= 1;
+  }
+  return 0;
 }
 /* 
  *  * reverseBytes - reverse the bytes of x
