@@ -150,12 +150,7 @@ int bitNor(int x, int y) {
  *       *   Rating: 4 
  *        */
 int isNonZero(int x) {
-
-
-
-
   return x;
-
 }
 /* 
  *  * copyLSB - set all bits of result to least significant bit of x
@@ -165,13 +160,7 @@ int isNonZero(int x) {
  *      *   Rating: 2
  *       */
 int copyLSB(int x) {
-  int a = x & 1;
-  int b = a | (a<<1);
-  int c = b | (b<<2);
-  int d = c | (c<<4);
-  int e = d | (d<<8);
-  int f = e | (e<<16);
-  return f;
+  return (x << 31) >> 31;
 }
 /* 
  *  * rotateRight - Rotate x to the right by n
@@ -182,8 +171,8 @@ int copyLSB(int x) {
  *       *   Rating: 3 
  *        */
 int rotateRight(int x, int n) {
-  int temp = ((1 << n) - 1) & x;
-  int mask = (1 << (31 - n)) - 1;
+  int temp = ((1 << n) + ~0) & x;
+  int mask = (1 << (31 + ~n + 1)) + ~0;
   x = (x >> n) & mask | (temp << n)
   return x;
 }
@@ -195,7 +184,7 @@ int rotateRight(int x, int n) {
  *      *   Rating: 2
  *       */
 int isNegative(int x) {
-  return x & (1 << 31);
+  return !!(x & (1 << 31));
 }
 /* 
  *  * absVal - absolute value of x
@@ -216,7 +205,7 @@ int absVal(int x) {
  *      *   Rating: 2
  *       */
 int negate(int x) {
-  return x ^ (1 << 31);
+  return ~x + 1;
 }
 /* 
  *  * float_abs - Return bit-level equivalent of absolute value of f for
@@ -256,7 +245,7 @@ unsigned float_twice(unsigned uf) {
  *      *   Rating: 1
  *       */
 int isTmin(int x) {
-  return !(x ^ (1 << 31));
+  return !(x ^ (~x + 1));
 }
 /* 
  *  * leastBitPos - return a mask that marks the position of the
@@ -267,7 +256,12 @@ int isTmin(int x) {
  *       *   Rating: 2 
  *        */
 int leastBitPos(int x) {
-  return 2;
+  int i;
+  for(i = 0; i < 32; i++) {
+		if(x&1) return 1 << i;
+		x <<= 1;
+	}
+	return 0;
 }
 /* 
  *  * reverseBytes - reverse the bytes of x
@@ -277,7 +271,7 @@ int leastBitPos(int x) {
  *      *   Rating: 3
  *       */
 int reverseBytes(int x) {
-  return 2;
+  return (x&255 << 24) | ((x>>8)&255 << 16) | ((x>>16)&255 << 8) | (x>>24);
 }
 /*
  *  * bitCount - returns count of number of 1's in word
@@ -287,7 +281,13 @@ int reverseBytes(int x) {
  *      *   Rating: 4
  *       */
 int bitCount(int x) {
-  return 2;
+  int i;
+  int c = 0;
+  for(i = 0; i < 32; i++) {
+    c += x & 1;
+    x >>= 1;
+  }
+  return c;
 }
 /* 
  *  * sign - return 1 if positive, 0 if zero, and -1 if negative
@@ -298,7 +298,7 @@ int bitCount(int x) {
  *       *  Rating: 2
  *        */
 int sign(int x) {
-    return 2;
+  return ((x & (1 << 31)) && ~0) || !!x;
 }
 /* 
  *  * bitMask - Generate a mask consisting of all 1's 
@@ -311,6 +311,8 @@ int sign(int x) {
  *         *   Rating: 3
  *          */
 int bitMask(int highbit, int lowbit) {
-  return 2;
+  int bits = highbit + ~lowbit + 1;
+  int neg = bits & (1 << 31);
+  return ((1 << ~bits) + ~0) << lowbit;
 }
 
