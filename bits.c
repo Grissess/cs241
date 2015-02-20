@@ -184,7 +184,7 @@ int rotateRight(int x, int n) {
  *      *   Rating: 2
  *       */
 int isNegative(int x) {
-  return !!(x & (1 << 31));
+  return 1 & (x >> 31);
 }
 /* 
  *  * absVal - absolute value of x
@@ -256,12 +256,7 @@ int isTmin(int x) {
  *       *   Rating: 2 
  *        */
 int leastBitPos(int x) {
-  int i;
-  for(i = 0; i < 32; i++) {
-    if(x&1) return 1 << i;
-    x <<= 1;
-  }
-  return 0;
+  return x & (~x + 1);
 }
 /* 
  *  * reverseBytes - reverse the bytes of x
