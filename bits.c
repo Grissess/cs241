@@ -150,7 +150,11 @@ int bitNor(int x, int y) {
  *       *   Rating: 4 
  *        */
 int isNonZero(int x) {
-  return x;
+  int a = (x >> 16) | x;
+  int b = (a >> 8) | a;
+  int c = (b >> 4) | b;
+  int d = (c >> 2) | d;
+  return (d >> 1) | d;
 }
 /* 
  *  * copyLSB - set all bits of result to least significant bit of x
