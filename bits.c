@@ -150,7 +150,12 @@ int bitNor(int x, int y) {
  *       *   Rating: 4 
  *        */
 int isNonZero(int x) {
-  return x;
+  int a = (x << 16) | x;
+  int b = (a << 8) | a;
+  int c = (b << 4) | b;
+  int d = (c << 2) | c;
+  int e = (d << 1) | d;
+  return 1 & (e >> 31);
 }
 /* 
  *  * copyLSB - set all bits of result to least significant bit of x
@@ -173,7 +178,7 @@ int copyLSB(int x) {
 int rotateRight(int x, int n) {
   int temp = ((1 << n) + ~0) & x;
   int mask = (1 << (31 + ~n + 1)) + ~0;
-  x = (x >> n) & mask | (temp << n)
+  x = ((x >> n) & mask) | (temp << (31 + ~n));
   return x;
 }
 /* 
@@ -195,7 +200,8 @@ int isNegative(int x) {
  *       *   Rating: 4
  *        */
 int absVal(int x) {
-  return x & ~(1 << 31);
+  int s = (x & (1 << 31)) >> 31;
+  return x ^ s + (1 & s);
 }
 /* 
  *  * negate - return -x 
@@ -266,7 +272,7 @@ int leastBitPos(int x) {
  *      *   Rating: 3
  *       */
 int reverseBytes(int x) {
-  return (x&255 << 24) | ((x>>8)&255 << 16) | ((x>>16)&255 << 8) | (x>>24);
+  return (x&255 << 24) | ((x>>8)&255 << 16) | ((x>>16)&255 << 8) | (x>>24)&255;
 }
 /*
  *  * bitCount - returns count of number of 1's in word
@@ -276,12 +282,9 @@ int reverseBytes(int x) {
  *      *   Rating: 4
  *       */
 int bitCount(int x) {
-  int i;
-  int c = 0;
-  for(i = 0; i < 32; i++) {
-    c += x & 1;
-    x >>= 1;
-  }
+  int i = 1;
+  int c = x & i;
+  
   return c;
 }
 /* 
@@ -293,7 +296,10 @@ int bitCount(int x) {
  *       *  Rating: 2
  *        */
 int sign(int x) {
-  return ((x & (1 << 31)) && ~0) || !!x;
+  int b = !!x;
+  int o = (b << 31) >> 31;
+  o &= (x >> 31) | b;
+  return o;
 }
 /* 
  *  * bitMask - Generate a mask consisting of all 1's 
@@ -306,8 +312,8 @@ int sign(int x) {
  *         *   Rating: 3
  *          */
 int bitMask(int highbit, int lowbit) {
-  int bits = highbit + ~lowbit + 1;
-  int neg = bits & (1 << 31);
-  return ((1 << ~bits) + ~0) << lowbit;
+  int b = highbit - lowbit;
+  b |= (b >> 31);
+  return ((1 << (b + 1)) - 1) << lowbit;
 }
 
