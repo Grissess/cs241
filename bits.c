@@ -1,7 +1,7 @@
 /* 
  *  * CS:APP Data Lab 
  *   * 
- *    * Graham Northup <northug>, et. al.
+ *    * Graham Northup <northug>, Andrew Yang <yanga>
  *     * 
  *      * bits.c - Source file with your solutions to the Lab.
  *       *          This is the file you will hand in to your instructor.
@@ -176,10 +176,9 @@ int copyLSB(int x) {
  *       *   Rating: 3 
  *        */
 int rotateRight(int x, int n) {
-  int temp = ((1 << n) + ~0) & x;
-  int mask = (1 << (31 + ~n + 1)) + ~0;
-  x = ((x >> n) & mask) | (temp << (31 + ~n));
-  return x;
+  int m = ((1 << 31) >> (n - 1));
+  int t = x & m;
+  return ((x & ~m) >> n) | (t >> (31 - n));
 }
 /* 
  *  * isNegative - return 1 if x < 0, return 0 otherwise 
@@ -251,7 +250,7 @@ unsigned float_twice(unsigned uf) {
  *      *   Rating: 1
  *       */
 int isTmin(int x) {
-  return !(x ^ (~x + 1));
+  return !(x ^ (~x + 1)); /* Credit Corey Richardson */
 }
 /* 
  *  * leastBitPos - return a mask that marks the position of the
@@ -262,7 +261,7 @@ int isTmin(int x) {
  *       *   Rating: 2 
  *        */
 int leastBitPos(int x) {
-  return x & (~x + 1);
+  return x & (~x + 1); /* Credit Andrew Yang */
 }
 /* 
  *  * reverseBytes - reverse the bytes of x
@@ -296,10 +295,7 @@ int bitCount(int x) {
  *       *  Rating: 2
  *        */
 int sign(int x) {
-  int b = !!x;
-  int o = (b << 31) >> 31;
-  o &= (x >> 31) | b;
-  return o;
+  return (x >> 30) | (!!x); /* Partial credit Ben Lannon */
 }
 /* 
  *  * bitMask - Generate a mask consisting of all 1's 
