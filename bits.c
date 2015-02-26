@@ -176,9 +176,11 @@ int copyLSB(int x) {
  *       *   Rating: 3 
  *        */
 int rotateRight(int x, int n) {
-  int m = ((1 << 31) >> (n - 1));
-  int t = x & m;
-  return ((x & ~m) >> n) | (t >> (31 - n));
+  int m = ((1 << 31) >> (31 - n));
+  unsigned t = x & m;
+  t >>= (31 - n);
+  printf("M=%d,T=%d\n",m,t);
+  return ((x<<n)&~m) | t;
 }
 /* 
  *  * isNegative - return 1 if x < 0, return 0 otherwise 
@@ -200,7 +202,7 @@ int isNegative(int x) {
  *        */
 int absVal(int x) {
   int s = (x & (1 << 31)) >> 31;
-  return x ^ s + (1 & s);
+  return (x ^ s) + (1 & s);
 }
 /* 
  *  * negate - return -x 
@@ -224,7 +226,7 @@ int negate(int x) {
  *          *   Rating: 2
  *           */
 unsigned float_abs(unsigned uf) {
-  if(uf & 0x7F800000 == 0x7F800000 && uf & 0x007FFFFF) return uf;
+  if((uf & 0x7F800000) == 0x7F800000 && (uf & 0x007FFFFF)) return uf;
   return uf & 0x7FFFFFFF;
 }
 /* 
@@ -239,8 +241,10 @@ unsigned float_abs(unsigned uf) {
  *          *   Rating: 4
  *           */
 unsigned float_twice(unsigned uf) {
-  if(uf & 0x7F800000 == 0x7F800000) return uf; /* Also infinity, because infinity can't be doubled */
-  return (uf & 0x107FFFFF) | (((uf & 0x7F800000) >> 23) + 1) << 23;
+  if((uf & 0x7F800000) == 0x7F800000) return uf; /* Also infinity, because infinity can't be doubled */
+  if((!(uf & 0x7F800000)))
+    return (uf & 0xFF800000) | ((uf & 0x007FFFFF) << 1);
+  return (uf & 0x807FFFFF) | ((((uf & 0x7F800000) >> 23) + 1) << 23);
 }
 /*
  *  * isTmin - returns 1 if x is the minimum, two's complement number,
@@ -250,7 +254,7 @@ unsigned float_twice(unsigned uf) {
  *      *   Rating: 1
  *       */
 int isTmin(int x) {
-  return !(x ^ (~x + 1)); /* Credit Corey Richardson */
+  return !!x & !(x ^ (~x + 1)); /* Partial credit Corey Richardson */
 }
 /* 
  *  * leastBitPos - return a mask that marks the position of the
@@ -271,7 +275,7 @@ int leastBitPos(int x) {
  *      *   Rating: 3
  *       */
 int reverseBytes(int x) {
-  return (x&255 << 24) | ((x>>8)&255 << 16) | ((x>>16)&255 << 8) | (x>>24)&255;
+  return ((x&255) << 24) | (((x>>8)&255) << 16) | (((x>>16)&255) << 8) | ((x>>24)&255);
 }
 /*
  *  * bitCount - returns count of number of 1's in word
@@ -310,6 +314,8 @@ int sign(int x) {
 int bitMask(int highbit, int lowbit) {
   int b = highbit - lowbit;
   b |= (b >> 31);
+  int f = b & 32;
+  b = (b ^ f) | (((f<<26)>>31)&31);
   return ((1 << (b + 1)) - 1) << lowbit;
 }
 
