@@ -176,10 +176,9 @@ int copyLSB(int x) {
  *       *   Rating: 3 
  *        */
 int rotateRight(int x, int n) {
-  int m = ((1 << 31) >> (31 - n));
+  int m = ((1 << 31) >> (n + ~30));
   unsigned t = x & m;
-  t >>= (31 - n);
-  printf("M=%d,T=%d\n",m,t);
+  t >>= (n + ~30);
   return ((x<<n)&~m) | t;
 }
 /* 
@@ -312,10 +311,11 @@ int sign(int x) {
  *         *   Rating: 3
  *          */
 int bitMask(int highbit, int lowbit) {
-  int b = highbit - lowbit;
+  int b = highbit + ~lowbit + 1;
+  int f;
   b |= (b >> 31);
-  int f = b & 32;
+  f = b & 32;
   b = (b ^ f) | (((f<<26)>>31)&31);
-  return ((1 << (b + 1)) - 1) << lowbit;
+  return ((1 << (b + 1)) + ~0) << lowbit;
 }
 
